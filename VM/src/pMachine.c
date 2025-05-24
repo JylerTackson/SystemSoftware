@@ -118,6 +118,16 @@ int pMachine(int* cIc){
 }
 
 
+struct stackFrame createStack(){
+	stackFrame stack;
+
+
+}
+
+
+
+
+//Convert from Text -> Ints
 int* convertInstructionCode(char* textCode){
 
 	/*Function that receives the raw information from the text document
@@ -132,11 +142,16 @@ int* convertInstructionCode(char* textCode){
 	 *	int* convertedInstructionCode (cIc) -> extracted ints from the
 	 *	textCode array
 	 */
-	
-	
-	
-	//create array to house the converted instruction codes
 	int convertedInstructionCode[3];
+	int inc = 0;
+	
+	for(int i=0;i<5;i++){
+		if(i%2==0){
+			convertedInstructionCode[inc] = textCode[i] - '0';
+			inc++;
+		}
+	}
+	return convertedInstructionCode;
 }
 
 
