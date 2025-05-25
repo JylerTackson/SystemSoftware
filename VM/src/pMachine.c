@@ -1,164 +1,190 @@
-//VM souce Code
-//
+#include "./include/pMachine.h"
 
+// VM souce Code
 
+// Contains the main logic for the VM Stack P-Machine
+int pMachine(int *cIc)
+{
+	int sp = 0;
+	int bp = 0;
+	int pc = 0;
 
-int pMachine(int* cIc){
-	//Contains the main logic for the VM Stack P-Machine
-	//
+	instructionRegister IR;
+	IR.op = cIc[0];
+	IR.l = cIc[1];
+	IR.m = cIc[2];
 
-	int OP = cIc[0];
-	int L = cIc[1];
-	int M = cIc[2];
+	// 1-11 Basic Instructions
+	// 12-24 Arithmetic & Operations
+	switch (IR.op)
+	{
+	case (1):
+		// INC - Allocate n locals
 
-	//1-11 Basic Instructions
-	//12-24 Arithmetic & Operations
-	switch(OP){
-		case(1):
-			//LIT 0 load literal
-			
-			break;
-		case(2):
-			//RTN - return
+		sp = sp - IR.m;
 
-			break;
-		case(3):
-			//LOD - load from stack to register
-			
-			break;
-		case(4):
-			//STO - store
+		break;
+	case (2):
+		// Arithmetic Operations
 
-			break;
-		case(5):
-			//CAL - call procedure
+		switch (IR.m)
+		{
+		case (1):
+			// ADD
 
-			break;
-		case(6):
-			//INC - increment SP
-			
-			break;
-		case(7):
-			//JMP - jump
-			
-			break;
-		case(8):
-			//JPC - jump conditional
+			pas[sp + 1] = pas[sp + 1] + pas[sp];
+			sp++;
 
 			break;
-		case(9):
-			//SIO1 - Output
+		case (2):
+			// SUB
+
+			pas[sp + 1] = pas[sp + 1] - pas[sp];
+			sp++;
 
 			break;
-		case(10):
-			//SIO2 - Input
+		case (3):
+			// MUL
+
+			pas[sp + 1] = pas[sp + 1] * pas[sp];
+			sp++;
 
 			break;
-		case(11):
-			//SIO3 - Halt
+		case (4):
+			// DIV
+
+			// Division by zero check
+			if (pas[sp] == 0)
+			{
+			}
+			pas[sp + 1] = pas[sp + 1] / pas[sp];
+			sp++;
 
 			break;
-		case(12):
-			//Neg - Negate
-			
-			break;
-		case(13):
-			//ADD
-		
-			break;
-		case(14):
-			//SUB
+		case (5):
+			// EQL
+
+			pas[sp + 1] = pas[sp + 1] == pas[sp];
+			sp++;
 
 			break;
-		case(15):
-			//MUL
+		case (6):
+			// NEQ - Check odd
+
+			pas[sp + 1] = pas[sp + 1] != pas[sp];
+			sp++;
 
 			break;
-		case(16):
-			//ODD
+		case (7):
+			// LSS
+
+			pas[sp + 1] = pas[sp + 1] < pas[sp];
+			sp++;
 
 			break;
-		case(17):
-			//ODD - Check odd
+		case (8):
+			// LEQ
+
+			pas[sp + 1] = pas[sp + 1] <= pas[sp];
+			sp++;
 
 			break;
-		case(18):
-			//MOD - Modulo
+		case (9):
+			// GTR
+
+			pas[sp + 1] = pas[sp + 1] > pas[sp];
+			sp++;
 
 			break;
-		case(19):
-			//EQL
+		case (10):
+			// GEQ
 
-			break;
-		case(20):
-			//NEQ
-
-			break;
-		case(21):
-			//LSS
-
-			break;
-		case(22):
-			//LEQ
-
-			break;
-		case(23):
-			//GTR
-
-			break;
-		case(24):
-			//GEQ
+			pas[sp + 1] = pas[sp + 1] >= pas[sp];
+			sp++;
 
 			break;
 		default:
-			printf("Improper Instruction Given.");
+			// invalid operation
+			printf("Invalid Arithmetic Operation");
 			return 0;
-
-
-}
-
-
-struct stackFrame createStack(){
-	stackFrame stack;
-
-
-}
-
-
-
-
-//Convert from Text -> Ints
-int* convertInstructionCode(char* textCode){
-
-	/*Function that receives the raw information from the text document
-	 *in the format of a char array and then converts it to an int array
-	 *by only extracting the integers for instructions. 
-	 *
-	 *Parameters:
-	 *	char* textCode -> char array from the text document containing
-	 *	instruction code for VM.
-	 *
-	 *Returns:
-	 *	int* convertedInstructionCode (cIc) -> extracted ints from the
-	 *	textCode array
-	 */
-	int convertedInstructionCode[3];
-	int inc = 0;
-	
-	for(int i=0;i<5;i++){
-		if(i%2==0){
-			convertedInstructionCode[inc] = textCode[i] - '0';
-			inc++;
+			break;
 		}
+
+		break;
+	case (3):
+		// LOD - load from stack to register
+
+		sp--;
+		pas[sp] = pas[base(bp, IR.l) + IR.m];
+
+		break;
+	case (4):
+		// STO - store
+
+		pas[base(bp, IR.l) - IR.m] = pas[sp];
+		sp++;
+
+		break;
+	case (5):
+		// CAL - call procedure
+
+		pas[sp - 1] = base(bp, IR.l); // return address
+		pas[sp - 2] = bp;			  // old base pointer
+		pas[sp - 3] = pc;			  // old program counter
+		bp = sp - 1;				  // new base pointer
+		pc = IR.m;					  // jump to new program counter
+
+		break;
+	case (6):
+		// LIT - increment SP
+
+		sp--;
+		pas[sp] = IR.m; // load literal value
+
+		break;
+	case (7):
+		// JMP - jump
+
+		pc = IR.m; // jump to new program counter
+
+		break;
+	case (8):
+		// JPC - jump conditional
+
+		if (pas[sp] == 0)
+		{
+			pc = IR.m; // jump to new program counter
+		}
+		sp++; // increment stack pointer
+
+		break;
+	case (9):
+		// SIO1 - Output
+
+		break;
+	case (10):
+		// SIO2 - Input
+
+		break;
+	case (11):
+		// SIO3 - Halt
+
+		break;
+
+	default:
+		printf("Improper Instruction Given.");
+		return 0;
 	}
-	return convertedInstructionCode;
 }
 
+int base(int BP, int L)
+{
 
-
-
-
-
-
-
-
+	int arb = BP;
+	while (L > 0)
+	{
+		arb = pas[arb]; // arb = activation record base
+		L--;			// find base L levels down
+	}
+	return arb;
+}
