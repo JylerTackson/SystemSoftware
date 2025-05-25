@@ -1,19 +1,32 @@
 #include "./include/pMachine.h"
 
 // VM souce Code
+int pMachine(int *cIc){
+	//initialization
+	int sp=0;
+	int bp=0;
+	int pc=0;
 
-// Contains the main logic for the VM Stack P-Machine
-int pMachine(int *cIc)
-{
-	int sp = 0;
-	int bp = 0;
-	int pc = 0;
+	//fetch cycle
+	fetch(cIc, pc);
+}
 
-	instructionRegister IR;
+int fetch(int *cIc, int programCounter){
+	//Store values within struct
 	IR.op = cIc[0];
 	IR.l = cIc[1];
 	IR.m = cIc[2];
 
+	//Increment Program Counter
+	programCounter = programCoutner +3;
+	return programCounter;
+}
+
+
+
+// Execute Cycle for the commands received within the fetch cycle
+void execute(int *cIc)
+{
 	// 1-11 Basic Instructions
 	// 12-24 Arithmetic & Operations
 	switch (IR.op)
