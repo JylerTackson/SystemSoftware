@@ -9,6 +9,9 @@ int pMachine(int *cIc){
 
 	//fetch cycle
 	fetch(cIc, pc);
+
+	//execute cycle
+	execute()
 }
 
 int fetch(int *cIc, int programCounter){
@@ -25,7 +28,7 @@ int fetch(int *cIc, int programCounter){
 
 
 // Execute Cycle for the commands received within the fetch cycle
-void execute(int *cIc)
+void execute()
 {
 	// 1-11 Basic Instructions
 	// 12-24 Arithmetic & Operations
@@ -69,6 +72,7 @@ void execute(int *cIc)
 			// Division by zero check
 			if (pas[sp] == 0)
 			{
+				pas[sp + 1] = 0
 			}
 			pas[sp + 1] = pas[sp + 1] / pas[sp];
 			sp++;
@@ -142,10 +146,10 @@ void execute(int *cIc)
 		// CAL - call procedure
 
 		pas[sp - 1] = base(bp, IR.l); // return address
-		pas[sp - 2] = bp;			  // old base pointer
-		pas[sp - 3] = pc;			  // old program counter
-		bp = sp - 1;				  // new base pointer
-		pc = IR.m;					  // jump to new program counter
+		pas[sp - 2] = bp;	// old base pointer
+		pas[sp - 3] = pc;	// old program counter
+		bp = sp - 1; 		// new base pointer
+		pc = IR.m;		// jump to new program counter
 
 		break;
 	case (6):

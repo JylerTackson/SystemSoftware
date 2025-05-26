@@ -25,7 +25,7 @@ int pMachine(int *cIc);
 
 //Fetch & Execute cycles for VM
 int fetch(int *cIc, int programCounter);
-void execute(int *cIc);
+void execute();
 
 //helper functions
 int base(int BP, int L);
