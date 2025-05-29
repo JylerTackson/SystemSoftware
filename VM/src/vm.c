@@ -1,15 +1,26 @@
-// vm.c
-// Student Name: Tyler Jackson
+// In this homework you will form a team and implement a virtual machine called the P-machine.
+// The P-machine is a stack machine that conceptually has one memory area called the process address space (PAS).
+//----------------------------------------------------------------------------------------------------------------
+// Student Name: David Tyler Jackson
+// Student ID: 5298477
+// Course: COP 3402 - Systems Software
+// Instructor: Dr. Montagne
+
+// This is the main file for the P-machine virtual machine.
+// This file contains the main function and the implementation of the P-machine virtual machine.
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "../include/vm.h"
 
+// Instruction Register Struct
+// Initialization of Global Variables
 int pas[ARRAY_SIZE] = {0};
-int BPStack[ARRAY_SIZE] = {0}; // Base Pointer Stack
+int BPStack[ARRAY_SIZE] = {0};
 int PC = 10, BP = 499, SP = 500, halt = 1;
 InstructionRegister IR;
 
+// DO NOT MODIFY THE FOLLOWING FUNCTION
 int base(int L, int BP)
 {
 	int arb = BP;
@@ -21,9 +32,10 @@ int base(int L, int BP)
 	return arb;
 }
 
+// Function to print the current state of the virtual machine
 void printState()
 {
-	// print the instruction
+	// print the instruction using the IR struct
 	if (IR.op == 2)
 		printf("%s %d  %d", oprNames[IR.m], IR.l, IR.m);
 	else
@@ -33,6 +45,8 @@ void printState()
 	printf("\t%d\t%d\t%d\t", PC, BP, SP);
 
 	// build dynamic‐link chain
+	// This will hold the base pointers in the chain to link back and determine how many
+	// bars is needed to print.
 	int dynCount = 0;
 	int dynBPs[ARRAY_SIZE];
 	int cur = BP;
@@ -201,20 +215,24 @@ int main(int argc, char *argv[])
 			switch (IR.m)
 			{
 			case 1:
+				// Output the top of the stack
 				printf("Output result is: %d\n", pas[SP]);
 				SP++;
 				break;
 			case 2:
+				// Input an integer and push it onto the stack
 				printf("Please Enter an Integer: ");
 				SP--;
 				scanf("%d", &pas[SP]);
 				break;
 			case 3:
+				// Halt the program
 				halt = 0;
 				break;
 			}
 			break;
 		}
+		// Print the current state of the virtual machine after execution of instructions
 		printState();
 	}
 	return 0;

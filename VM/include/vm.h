@@ -1,5 +1,13 @@
-// pMachine.h
-// Student Name: Tyler Jackson
+// In this homework you will form a team and implement a virtual machine called the P-machine.
+// The P-machine is a stack machine that conceptually has one memory area called the process address space (PAS).
+//----------------------------------------------------------------------------------------------------------------
+// Student Name: David Tyler Jackson
+// Student ID: 5298477
+// Course: COP 3402 - Systems Software
+// Instructor: Dr. Montagne
+
+// This is the header file for the P-machine virtual machine.
+// This file contains the declarations and definitions for the P-machine virtual machine.
 
 #ifndef PMACHINE_H
 #define PMACHINE_H
