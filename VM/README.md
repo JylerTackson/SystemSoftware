@@ -47,6 +47,8 @@ gcc -Wall vm.c -o vm.exe
 
 ```
 
+---
+
 ## How to Execute
 
 To execute the compiled project, use the following command:
