@@ -38,8 +38,26 @@
 
 
 
-int main(){
+int main(int argc, char *argv[]){
 
+	//validate an input file was inserted
+	if(argc < 2){
+		printf("Usage: %s <input file>\n", argv[0]);
+		return 1;
+	}
+
+	//Open File
+	FILE *fp = fopen(argv[1], "r");
+	if(!fp){
+		printf("Error: Cannot open file %s\n", argv[1]);
+		return 1;
+	}
+
+	i=0 //true value
+	j=1 //look ahead
+	while(){
+		
+	}
 
 
 }
