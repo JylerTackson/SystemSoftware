@@ -36,6 +36,14 @@
 //	- Invalid Symbols
 //Error detected, an error message is printed and the scanner continues
 
+//includes
+#include "../include/lex.h"
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+//globals
+
 
 
 int main(int argc, char *argv[]){
@@ -53,13 +61,28 @@ int main(int argc, char *argv[]){
 		return 1;
 	}
 
-	i=0 //true value
-	j=1 //look ahead
-	while(){
+	//int i=0; //true value
+	//int j=1; //look ahead
+	int curr;
+
+	//main loop that will read the file and assign the token id's
+	while((curr = fgetc(fp)) != EOF){
 		
-	}
+		printf("%c", curr);
+		
+		//skip white space
+		if(1){
+		}
+
+		//skip comments
+		if(1){
+		}
+
+		
+	}//end while
+}//end main
 
 
-}
+
 
 
