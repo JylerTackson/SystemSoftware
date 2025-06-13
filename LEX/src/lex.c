@@ -36,6 +36,7 @@
 //	- Invalid Symbols
 //Error detected, an error message is printed and the scanner continues
 
+<<<<<<< HEAD
 //includes
 #include "../include/lex.h"
 #include <string.h>
@@ -44,7 +45,36 @@
 
 //globals
 
+=======
+#include <stdio.h> //load needed libraries
+#include <stdlib.h> 
+#include <string.h>
+>>>>>>> 936fff3310a0238c0311fe8e4dbc38f12459f057
 
+#define MAX_IDENT_LENGTH 11 //maximum letterrs in ideentifier
+#define MAX_NUMBER_LENGTH 5 //max digits in number 
+#define MAX_LEXEMES 1000 //how many total token can be stored in lexeme list
+
+typedef enum { //declaration of Token Types
+skipsym = 1, identsym, numbersym, plussym, minussym,
+multsym,  slashsym, fisym, eqsym, neqsym, lessym, leqsym,
+gtrsym, geqsym, lparentsym, rparentsym, commasym, semicolonsym,
+periodsym, becomessym, beginsym, endsym, ifsym, thensym, 
+whilesym, dosym, callsym, constsym, varsym, procsym, writesym,
+readsym , elsesym} token_type;
+
+const char *reservedWords[] = { //program reserved words
+  "const","var","procedure","call",
+  "begin","end","if","then","else",
+  "fi","while","do","read","write",
+  NULL
+};
+
+const token_type reservedTokens[] = { //program reserved tokens
+  constsym, varsym, procsym, callsym,
+  beginsym, endsym, ifsym,  thensym, elsesym,
+  fisym,   whilesym, dosym,   readsym, writesym
+};
 
 int main(int argc, char *argv[]){
 
