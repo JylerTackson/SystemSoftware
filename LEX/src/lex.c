@@ -3,8 +3,8 @@
 // GROUP:
 //	David T. Jackson
 //	5298477
-//	Santiago H. R
-//	#PID
+//	Santiago Henao Rojas
+//	5122384
 //------------------------------
 // ASSIGNMENT 2:
 //	Implement a lexical analyzer for the programming lanague PL/0.
@@ -41,6 +41,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 // Define Constants
 #define MAX_IDENT_LENGTH 11 // maximum letters in identifier
@@ -49,8 +50,8 @@
 
 // Function Prototypes
 void printFile(FILE *fp);
-void printLexemeTable(struct LexemeEntry lex[], int count);
-void printTokenList(struct TokenEntry tokens[], int count);
+void printLexemeTable(LexemeEntry lex[], int count);
+void printTokenList(LexemeEntry lex[], int count);
 int getToken(const char *L);
 
 typedef enum
@@ -136,6 +137,7 @@ int main(int argc, char *argv[])
 	//--------------------------------------------
 
 	printFile(fp); // print the source file
+	rewind(fp); // return pointer back to beginning of file
 
 	int curr;	   // true value
 	int lookAhead; // look ahead
@@ -356,9 +358,85 @@ int main(int argc, char *argv[])
 		} // end switch - end check for operators and symbols
 
 		// Check for identifiers and numbers
-		if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z'))
-		{
+		if(isalpha(curr)){
+			char buffer[MAX_IDENT_LENGTH + 1];
+			int len = 0;
+			// collect letters and digits
+			do{
+				if(len < MAX_IDENT_LENGTH){
+					buffer[len++] = curr; // if length is smaller than 11 save into buffer
+				}
+				else{
+					len++; // count for overflow and do not store into buffer
+				}
+				curr = fgetc(fp); // read next character
+			}while(isalnum(curr)); // continue do-while loop
+			ungetc(curr, fp); // push back into stream if non-alnum
+
+			if(len > MAX_IDENT_LENGTH){
+				buffer[MAX_IDENT_LENGTH] = '\0'; //truncate buffer
+			}
+			else{
+				buffer[len] = '\0';
+			}
+
+			if(len > MAX_IDENT_LENGTH){
+				// ident name too long error
+				lexemeTable[lexemeCount].isError = true;
+				strcpy(lexemeTable[lexemeCount].errorMessage, "Error: name too long");
+			}
+			else{
+				int tok = getToken(buffer);
+				if(tok != 0){
+					lexemeTable[lexemeCount].tokenNumber = tok; // save reserved word in lexeme table
+				}
+				else{
+					lexemeTable[lexemeCount].tokenNumber = identsym; // save user identifier in lexeme table
+				}
+				strcpy(lexemeTable[lexemeCount].lexeme, buffer);
+				lexemeTable[lexemeCount].isError = false;
+				lexemeTable[lexemeCount].errorMessage[0] = '\0';
+			}
+			lexemeCount++;
+			continue;
 		}
+
+		if(isdigit(curr)){
+			char buffer[MAX_IDENT_LENGTH + 1];
+			int len = 0;
+			//collect digits
+			do{
+				if(len < MAX_NUMBER_LENGTH){
+					buffer[len++] = curr; // save into buffer if less than 5
+				}
+				else{
+					len++; // count for overflow
+				}
+				curr = fgetc(fp);
+			}while(isdigit(curr));
+		ungetc(curr, fp); // push back any non-digit
+
+		if(len > MAX_NUMBER_LENGTH){
+			buffer[MAX_NUMBER_LENGTH] = '\0'; // truncate buffer
+		}
+		else{
+			buffer[len] = '\0'; 
+		}
+
+		if(len > MAX_NUMBER_LENGTH){
+			// number too long error
+			lexemeTable[lexemeCount].isError = true; // 
+			strcpy(lexemeTable[lexemeCount].errorMessage, "Error: number too long");
+		}
+		else{
+			lexemeTable[lexemeCount].tokenNumber = numbersym; // save token number 
+			strcpy(lexemeTable[lexemeCount].lexeme, buffer); // copy buffer into lexeme index
+			lexemeTable[lexemeCount].isError = false;
+			lexemeTable[lexemeCount].errorMessage[0] = '\0';
+		}
+		lexemeCount++;
+		continue;
+		} 
 
 	} // end while
 	fclose(fp); // close the file
