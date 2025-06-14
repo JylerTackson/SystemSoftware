@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
 			// Handle less than operator
 			lookAhead = fgetc(fp); // look ahead for '=' or '>'
 
-			if (lookahead == '=')
+			if (lookAhead == '=')
 			{
 				// If '=' found, it's a less than or equal operator
 				lexemeTable[lexemeCount].tokenNumber = leqsym;	   // set token number for less than or equal
@@ -250,7 +250,7 @@ int main(int argc, char *argv[])
 			else if (lookAhead == '>')
 			{
 				// If '>' found, it's a not equal operator
-				lexemeTable[lexemeCount].tokenNumber = neqSym;	   // set token number for not equal
+				lexemeTable[lexemeCount].tokenNumber = neqsym;	   // set token number for not equal
 				strcpy(lexemeTable[lexemeCount].lexeme, "<>");	   // set lexeme
 				lexemeTable[lexemeCount].isError = false;		   // no error
 				strcpy(lexemeTable[lexemeCount].errorMessage, ""); // no error message
@@ -271,7 +271,7 @@ int main(int argc, char *argv[])
 			// Handle greater than operator
 			lookAhead = fgetc(fp); // look ahead for '='
 
-			if (lookahead == '=')
+			if (lookAhead == '=')
 			{
 				// If '=' found, it's a greater than or equal operator
 				lexemeTable[lexemeCount].tokenNumber = geqsym;	   // set token number for greater than or equal
@@ -291,6 +291,61 @@ int main(int argc, char *argv[])
 			}
 
 			break;
+
+		case '=':
+			// Handle equality operator
+			lexemeTable[lexemeCount].tokenNumber = eqsym;       // set token number for “=”
+			strcpy(lexemeTable[lexemeCount].lexeme, "=");       // set lexeme to “=”
+			lexemeTable[lexemeCount].isError = false;           // no error
+			strcpy(lexemeTable[lexemeCount].errorMessage, "");  // clear error message
+			lexemeCount++;                                      // increment lexeme count
+			break;
+
+		case '(':
+			// Handle left parenthesis
+			lexemeTable[lexemeCount].tokenNumber = lparentsym;  // set token number for “(”
+			strcpy(lexemeTable[lexemeCount].lexeme, "(");       // set lexeme to “(”
+			lexemeTable[lexemeCount].isError = false;           // no error
+			strcpy(lexemeTable[lexemeCount].errorMessage, "");  // clear error message
+			lexemeCount++;                                      // increment lexeme count
+			break;
+
+		case ')':
+			// Handle right parenthesis
+			lexemeTable[lexemeCount].tokenNumber = rparentsym;  // set token number for “)”
+			strcpy(lexemeTable[lexemeCount].lexeme, ")");       // set lexeme to “)”
+			lexemeTable[lexemeCount].isError = false;           // no error
+			strcpy(lexemeTable[lexemeCount].errorMessage, "");  // clear error message
+			lexemeCount++;                                      // increment lexeme count
+			break;
+
+		case ',':
+			// Handle comma symbol
+			lexemeTable[lexemeCount].tokenNumber = commasym;    // set token number for “,”
+			strcpy(lexemeTable[lexemeCount].lexeme, ",");       // set lexeme to “,”
+			lexemeTable[lexemeCount].isError = false;           // no error
+			strcpy(lexemeTable[lexemeCount].errorMessage, "");  // clear error message
+			lexemeCount++;                                      // increment lexeme count
+			break;
+
+		case ';':
+			// Handle semicolon symbol
+			lexemeTable[lexemeCount].tokenNumber = semicolonsym;// set token number for “;”
+			strcpy(lexemeTable[lexemeCount].lexeme, ";");       // set lexeme to “;”
+			lexemeTable[lexemeCount].isError = false;           // no error
+			strcpy(lexemeTable[lexemeCount].errorMessage, "");  // clear error message
+			lexemeCount++;                                      // increment lexeme count
+			break;
+
+		case '.':
+			// Handle period symbol
+			lexemeTable[lexemeCount].tokenNumber = periodsym;   // set token number for “.”
+			strcpy(lexemeTable[lexemeCount].lexeme, ".");       // set lexeme to “.”
+			lexemeTable[lexemeCount].isError = false;           // no error
+			strcpy(lexemeTable[lexemeCount].errorMessage, "");  // clear error message
+			lexemeCount++;                                      // increment lexeme count
+			break;
+
 		default:
 			// Handle invalid character
 			lexemeTable[lexemeCount].isError = true;							// mark as error
