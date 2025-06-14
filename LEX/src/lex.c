@@ -103,13 +103,6 @@ const token_type reservedTokens[] = {
 	beginsym, endsym, ifsym, thensym, elsesym,
 	fisym, whilesym, dosym, readsym, writesym};
 
-// Token Entry Structure
-typedef struct
-{
-	int tokenNumber;
-	char tokenType[MAX_IDENT_LENGTH + MAX_NUMBER_LENGTH];
-} TokenEntry;
-
 // Lexeme Entry Structure
 typedef struct
 {
@@ -121,6 +114,8 @@ typedef struct
 
 int main(int argc, char *argv[])
 {
+	LexemeEntry lexemeTable[MAX_LEXEMES]; // Lexeme Table
+	int lexemeCount = 0;				  // Count of lexemes
 
 	// Validate and Open Input File
 	//-------------------------------------------
@@ -139,6 +134,8 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	//--------------------------------------------
+
+	printFile(fp); // print the source file
 
 	int curr;	   // true value
 	int lookAhead; // look ahead
@@ -174,8 +171,137 @@ int main(int argc, char *argv[])
 				ungetc(lookAhead, fp); // put back lookahead if not a comment
 			}
 		} // End Check for comments
-	}
-}
+
+		// Check for operators and symbols
+		switch (curr)
+		{
+		case '+':
+
+			// Add plus symbol to table
+			lexemeTable[lexemeCount].tokenNumber = plussym;	   // set token number for plus
+			strcpy(lexemeTable[lexemeCount].lexeme, "+");	   // set lexeme
+			lexemeTable[lexemeCount].isError = false;		   // no error
+			strcpy(lexemeTable[lexemeCount].errorMessage, ""); // no error message
+			lexemeCount++;									   // increment lexeme count
+			break;
+
+		case '-':
+
+			// Handle minus operator
+			lexemeTable[lexemeCount].tokenNumber = minussym;   // set token number for minus
+			strcpy(lexemeTable[lexemeCount].lexeme, "-");	   // set lexeme
+			lexemeTable[lexemeCount].isError = false;		   // no error
+			strcpy(lexemeTable[lexemeCount].errorMessage, ""); // no error message
+			lexemeCount++;									   // increment lexeme count
+
+			break;
+		case '*':
+
+			// Handle multiplication operator
+			lexemeTable[lexemeCount].tokenNumber = multsym;	   // set token number for multiplication
+			strcpy(lexemeTable[lexemeCount].lexeme, "*");	   // set lexeme
+			lexemeTable[lexemeCount].isError = false;		   // no error
+			strcpy(lexemeTable[lexemeCount].errorMessage, ""); // no error message
+			lexemeCount++;									   // increment lexeme count
+
+			break;
+		case '/':
+
+			// Handle division operator
+			lexemeTable[lexemeCount].tokenNumber = divsym;	   // set token number for division
+			strcpy(lexemeTable[lexemeCount].lexeme, "/");	   // set lexeme
+			lexemeTable[lexemeCount].isError = false;		   // no error
+			strcpy(lexemeTable[lexemeCount].errorMessage, ""); // no error message
+			lexemeCount++;									   // increment lexeme count
+
+			break;
+		case ':':
+			// Handle assignment operator
+			lookAhead = fgetc(fp); // look ahead for '='
+
+			if (lookAhead == '=')
+			{
+				// If '=' found, it's an assignment operator
+				lexemeTable[lexemeCount].tokenNumber = becomessym; // set token number for assignment
+				strcpy(lexemeTable[lexemeCount].lexeme, ":=");	   // set lexeme
+				lexemeTable[lexemeCount].isError = false;		   // no error
+				strcpy(lexemeTable[lexemeCount].errorMessage, ""); // no error message
+				lexemeCount++;									   // increment lexeme count
+			}
+			else
+			{
+				ungetc(lookAhead, fp); // put back lookahead if not '='
+			}
+
+			break;
+		case '<':
+			// Handle less than operator
+			lookAhead = fgetc(fp); // look ahead for '=' or '>'
+
+			if (lookahead == '=')
+			{
+				// If '=' found, it's a less than or equal operator
+				lexemeTable[lexemeCount].tokenNumber = leqsym;	   // set token number for less than or equal
+				strcpy(lexemeTable[lexemeCount].lexeme, "<=");	   // set lexeme
+				lexemeTable[lexemeCount].isError = false;		   // no error
+				strcpy(lexemeTable[lexemeCount].errorMessage, ""); // no error message
+				lexemeCount++;									   // increment lexeme count
+			}
+			else if (lookAhead == '>')
+			{
+				// If '>' found, it's a not equal operator
+				lexemeTable[lexemeCount].tokenNumber = neqSym;	   // set token number for not equal
+				strcpy(lexemeTable[lexemeCount].lexeme, "<>");	   // set lexeme
+				lexemeTable[lexemeCount].isError = false;		   // no error
+				strcpy(lexemeTable[lexemeCount].errorMessage, ""); // no error message
+				lexemeCount++;									   // increment lexeme count
+			}
+			else
+			{
+				ungetc(lookAhead, fp);							   // put back lookahead if not '=' or '>'
+				lexemeTable[lexemeCount].tokenNumber = lessym;	   // set token number for less than
+				strcpy(lexemeTable[lexemeCount].lexeme, "<");	   // set lexeme
+				lexemeTable[lexemeCount].isError = false;		   // no error
+				strcpy(lexemeTable[lexemeCount].errorMessage, ""); // no error message
+				lexemeCount++;									   // increment lexeme count
+			}
+
+			break;
+		case '>':
+			// Handle greater than operator
+			lookAhead = fgetc(fp); // look ahead for '='
+
+			if (lookahead == '=')
+			{
+				// If '=' found, it's a greater than or equal operator
+				lexemeTable[lexemeCount].tokenNumber = geqsym;	   // set token number for greater than or equal
+				strcpy(lexemeTable[lexemeCount].lexeme, ">=");	   // set lexeme
+				lexemeTable[lexemeCount].isError = false;		   // no error
+				strcpy(lexemeTable[lexemeCount].errorMessage, ""); // no error message
+				lexemeCount++;									   // increment lexeme count
+			}
+			else
+			{
+				ungetc(lookAhead, fp);							   // put back lookahead if not '='
+				lexemeTable[lexemeCount].tokenNumber = gtrsym;	   // set token number for greater than
+				strcpy(lexemeTable[lexemeCount].lexeme, ">");	   // set lexeme
+				lexemeTable[lexemeCount].isError = false;		   // no error
+				strcpy(lexemeTable[lexemeCount].errorMessage, ""); // no error message
+				lexemeCount++;									   // increment lexeme count
+			}
+
+			break;
+		default:
+			// Handle invalid character
+			lexemeTable[lexemeCount].isError = true;							// mark as error
+			lexemeTable[lexemeCount].tokenNumber = 0;							// no token number
+			strcpy(lexemeTable[lexemeCount].errorMessage, "Invalid character"); // set error message
+			lexemeTable[lexemeCount].lexeme[0] = curr;							// set lexeme to the invalid character
+			break;
+		} // end switch - end check for operators and symbols
+	} // end while
+	fclose(fp); // close the file
+} // end main
 
 void printFile(FILE *fp)
 {
@@ -219,20 +345,20 @@ void printLexemeTable(LexemeEntry lex[], int count)
 }
 
 // Function to print the token list
-void printTokenList(TokenEntry tokens[], int count)
+void printTokenList(LexemeEntry lex[], int count)
 {
 	printf("\nToken List:\n");
 	for (int i = 0; i < count; i++)
 	{
 		if (i > 0)
 			printf(" ");
-		if (tokens[i].token == identsym || tokens[i].token == numbersym)
+		if (lex[i].tokenNumber == identsym || lex[i].tokenNumber == numbersym)
 		{
-			printf("%d %s", tokens[i].tokenNumber, tokens[i].value);
+			printf("%d %s", lex[i].tokenNumber, lex[i].lexeme);
 		}
 		else
 		{
-			printf("%d", tokens[i].tokenNumber);
+			printf("%d", lex[i].tokenNumber);
 		}
 	}
 }
