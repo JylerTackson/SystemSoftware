@@ -299,6 +299,12 @@ int main(int argc, char *argv[])
 			lexemeTable[lexemeCount].lexeme[0] = curr;							// set lexeme to the invalid character
 			break;
 		} // end switch - end check for operators and symbols
+
+		// Check for identifiers and numbers
+		if ((curr >= 'a' && curr <= 'z') || (curr >= 'A' && curr <= 'Z'))
+		{
+		}
+
 	} // end while
 	fclose(fp); // close the file
 } // end main
