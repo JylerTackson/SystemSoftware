@@ -1,0 +1,12 @@
+program syntaxTest;
+var x, y: integer;
+
+begin
+  x := 10;
+  y := 20;
+  @z := 30;
+  #writeln(x);
+  $x := x + 1;
+  writeln('Result is: ', x, y);
+  x := x + ^5;
+end.

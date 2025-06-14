@@ -1,0 +1,13 @@
+program longTokenTest;
+var i: integer;
+begin
+
+/* This loop will generate >1000 tokens */
+
+  for i := 1 to 500 do
+  begin
+    writeln('This is line number ', i);
+    writeln('Testing lexer with repetitive structure.');
+    writeln('Token overload incoming.');
+  end;
+end.

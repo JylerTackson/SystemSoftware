@@ -1,5 +1,6 @@
 {
     "files.associations": {
         "vm.h": "c"
-    }
+    },
+    "C_Cpp.default.compilerPath": "c:/Users/me/msys/ucrt64/bin/gcc.exe"
 }
