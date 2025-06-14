@@ -144,6 +144,13 @@ int main(int argc, char *argv[])
 	while ((curr = fgetc(fp)) != EOF)
 	{
 
+		// printf("\nEnter While Loop\n");
+		if (lexemeCount >= MAX_LEXEMES)
+		{
+			printf("\nError: Lexeme table overflow, max %d lexemes allowed.\n", MAX_LEXEMES);
+			break; // exit if lexeme table is full
+		}
+
 		// Skip invisible characters
 		if (curr == ' ' || curr == '\n' || curr == '\t')
 		{
