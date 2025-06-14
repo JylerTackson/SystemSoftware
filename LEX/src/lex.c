@@ -39,6 +39,8 @@
 #include <stdio.h> //load needed libraries
 #include <stdlib.h> 
 #include <string.h>
+#include <stdbool.h>
+
 
 #define MAX_IDENT_LENGTH 11 //maximum letterrs in ideentifier
 #define MAX_NUMBER_LENGTH 5 //max digits in number 
@@ -65,10 +67,31 @@ const token_type reservedTokens[] = { //program reserved tokens
   fisym,   whilesym, dosym,   readsym, writesym
 };
 
+int getToken(const char *L){ //function to return correct token of reserved word
+	for(int i=0; i < reservedWords[i]; i++){
+		if(strcmp(L, reservedWords[i] == 0)){
+			return reservedTokens[i];
+		}
+	}
+	return 0;
+}
+
+typedef struct {
+	int tokenNumber;
+	char tokenType[ MAX_IDENT_LENGTH + MAX_NUMBER_LENGTH];
+} TokenEntry;
+
+typedef struct{
+	char lexeme[MAX_IDENT_LENGTH + MAX_NUMBER_LENGTH];
+	int tokenNumber;
+	bool isError;
+	char errorMessage[50];
+} LexemeEntry;
+
 int main(int argc, char *argv[]){
 
 	//validate an input file was inserted
-	if(argc < 2){
+	if(argc != 2){
 		printf("Usage: %s <input file>\n", argv[0]);
 		return 1;
 	}
