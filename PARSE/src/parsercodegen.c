@@ -23,8 +23,7 @@
 // • while must be followed by do
 // • condition must contain comparison operator
 // • right parenthesis must follow left parenthesis
-// • arithmetic equations must contain operands, parentheses, numbers, or
-// symbols
+// • arithmetic equations must contain operands, parentheses, numbers, or symbols
 
 // Load Libraries
 #include <stdio.h>
@@ -37,6 +36,18 @@
 #define MAX_IDENT_LENGTH 11 // maximum letters in identifier
 #define MAX_NUMBER_LENGTH 5 // max digits in number
 #define MAX_LEXEMES 1000	// how many total token can be stored in lexeme list
+#define MAX_SYMBOLTABLE_LENGTH 500
+
+// symbol table
+typedef struct
+{
+	int kind;
+	char name[10];
+	int val;
+	int level;
+	int addr;
+	int mark;
+} symbol;
 
 typedef enum
 { // declaration of Token Types
