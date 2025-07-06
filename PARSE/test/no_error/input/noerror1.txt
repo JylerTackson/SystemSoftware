@@ -5,6 +5,6 @@ begin
   x := a + b;
   if x > 10 then
     y := x - 10;
-  while y < 20 do
+  when y < 20 do
     y := y + 1
 end.
