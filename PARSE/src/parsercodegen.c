@@ -49,6 +49,11 @@ typedef struct
 	int mark;
 } symbol;
 
+typedef struct{
+	int op;
+	int l;
+	int m;
+} instruction;
 typedef enum
 { // declaration of Token Types
 	oddsym = 1,
@@ -113,6 +118,20 @@ void printFile(FILE *fp);
 void printLexemeTable(LexemeEntry lex[], int count);
 void printTokenList(LexemeEntry lex[], int count);
 int getToken(const char *L);
+
+LexemeEntry lexemTable[MAX_LEXEMES];
+int lexemeCount = 0;
+
+#define MAX_CODE 500
+instruction code[MAX_CODE];
+int cx = 0;
+
+symbol symTable[MAX_SYMBOLTABLE_LENGTH];
+int symCount = 0;
+
+enum opcodes { LIT=1, OPR, LOD, STO, CAL, INC, JMP, JPC, SIO };
+int currToken;
+char currLexeme[50];
 
 int main(int argc, char *argv[])
 {
@@ -518,6 +537,16 @@ void printLexemeTable(LexemeEntry lex[], int count)
 	}
 }
 
+
+
+
+
+
+
+
+
+
+
 // Function to print the token list
 void printTokenList(LexemeEntry lex[], int count)
 {
@@ -535,4 +564,28 @@ void printTokenList(LexemeEntry lex[], int count)
 			printf("%d", lex[i].tokenNumber);
 		}
 	}
+}
+
+void printCode(){
+	printf("\nAssembly Code:\nLine\tOP\tL\tM\n");
+    for (int i = 0; i < cx; i++){
+		printf("%d\t%d\t%d\t%d\n",
+               i, code[i].op, code[i].l, code[i].m);
+	}
+}
+
+void printSymbolTable(){
+	printf("\nSymbol Table:\nKind | Name | Value | Level | Address | Mark\n");
+    printf("---------------------------------------------------\n");
+    for (int i = 0; i < symCount; i++)
+    {
+        if (!symTable[i].mark) continue;
+        printf("%d | %s | %d | %d | %d | %d\n",
+               symTable[i].kind,
+               symTable[i].name,
+               symTable[i].val,
+               symTable[i].level,
+               symTable[i].addr,
+               symTable[i].mark);
+    }
 }
