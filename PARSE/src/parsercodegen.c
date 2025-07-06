@@ -567,7 +567,7 @@ void varDecl(int *nVars)
 }
 
 // statement - Parses a statement.
-// Supports assignment, begin...end blocks, if, while,
+// Supports assignment, begin...end blocks, if, when,
 // read, and write statements, or does nothing for empty statements.
 void statement()
 {
