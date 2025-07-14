@@ -48,12 +48,6 @@
 #define MAX_NUMBER_LENGTH 5 // max digits in number
 #define MAX_LEXEMES 1000	// how many total token can be stored in lexeme list
 
-// Function Prototypes
-void printFile(FILE *fp);
-void printLexemeTable(LexemeEntry lex[], int count);
-void printTokenList(LexemeEntry lex[], int count);
-int getToken(const char *L);
-
 typedef enum
 { // declaration of Token Types
 	skipsym = 1,
@@ -113,6 +107,12 @@ typedef struct
 	char errorMessage[50];
 } LexemeEntry;
 
+// Function Prototypes
+void printFile(FILE *fp);
+void printLexemeTable(LexemeEntry lex[], int count);
+void printTokenList(LexemeEntry lex[], int count);
+int getToken(const char *L);
+
 int main(int argc, char *argv[])
 {
 	LexemeEntry lexemeTable[MAX_LEXEMES]; // Lexeme Table
@@ -137,12 +137,20 @@ int main(int argc, char *argv[])
 	//--------------------------------------------
 
 	printFile(fp); // print the source file
-	rewind(fp); // return pointer back to beginning of file
+	rewind(fp);	   // return pointer back to beginning of file
 
 	int curr;	   // true value
 	int lookAhead; // look ahead
 	while ((curr = fgetc(fp)) != EOF)
 	{
+
+		// printf("\nEnter While Loop\n");
+		if (lexemeCount >= MAX_LEXEMES)
+		{
+			printf("\nError: Lexeme table overflow, max %d lexemes allowed.\n", MAX_LEXEMES);
+			break; // exit if lexeme table is full
+		}
+
 		// Skip invisible characters
 		if (curr == ' ' || curr == '\n' || curr == '\t')
 		{
@@ -173,6 +181,106 @@ int main(int argc, char *argv[])
 				ungetc(lookAhead, fp); // put back lookahead if not a comment
 			}
 		} // End Check for comments
+
+		// Check for identifiers
+		if (isalpha(curr))
+		{
+			char buffer[MAX_IDENT_LENGTH + 1];
+			int len = 0;
+			// collect letters and digits
+			do
+			{
+				if (len < MAX_IDENT_LENGTH)
+				{
+					buffer[len++] = curr; // if length is smaller than 11 save into buffer
+				}
+				else
+				{
+					len++; // count for overflow and do not store into buffer
+				}
+				curr = fgetc(fp); // read next character
+			} while (isalnum(curr)); // continue do-while loop
+			ungetc(curr, fp); // push back into stream if non-alnum
+
+			if (len > MAX_IDENT_LENGTH)
+			{
+				buffer[MAX_IDENT_LENGTH] = '\0'; // truncate buffer
+			}
+			else
+			{
+				buffer[len] = '\0';
+			}
+
+			if (len > MAX_IDENT_LENGTH)
+			{
+				// ident name too long error
+				lexemeTable[lexemeCount].isError = true;
+				strcpy(lexemeTable[lexemeCount].errorMessage, "Error: name too long");
+			}
+			else
+			{
+				int tok = getToken(buffer);
+				if (tok != 0)
+				{
+					lexemeTable[lexemeCount].tokenNumber = tok; // save reserved word in lexeme table
+				}
+				else
+				{
+					lexemeTable[lexemeCount].tokenNumber = identsym; // save user identifier in lexeme table
+				}
+				strcpy(lexemeTable[lexemeCount].lexeme, buffer);
+				lexemeTable[lexemeCount].isError = false;
+				lexemeTable[lexemeCount].errorMessage[0] = '\0';
+			}
+			lexemeCount++;
+			continue;
+		}
+
+		// Check for numbers
+		if (isdigit(curr))
+		{
+			char buffer[MAX_IDENT_LENGTH + 1];
+			int len = 0;
+			// collect digits
+			do
+			{
+				if (len < MAX_NUMBER_LENGTH)
+				{
+					buffer[len++] = curr; // save into buffer if less than 5
+				}
+				else
+				{
+					len++; // count for overflow
+				}
+				curr = fgetc(fp);
+			} while (isdigit(curr));
+			ungetc(curr, fp); // push back any non-digit
+
+			if (len > MAX_NUMBER_LENGTH)
+			{
+				buffer[MAX_NUMBER_LENGTH] = '\0'; // truncate buffer
+			}
+			else
+			{
+				buffer[len] = '\0';
+			}
+
+			if (len > MAX_NUMBER_LENGTH)
+			{
+				// number too long error
+				lexemeTable[lexemeCount].isError = true; //
+				strcpy(lexemeTable[lexemeCount].errorMessage, "Error: number too long");
+			}
+			else
+			{
+				lexemeTable[lexemeCount].tokenNumber = numbersym; // save token number
+				strcpy(lexemeTable[lexemeCount].lexeme, buffer);  // copy buffer into lexeme index
+				lexemeTable[lexemeCount].isError = false;
+				lexemeTable[lexemeCount].errorMessage[0] = '\0';
+			}
+			lexemeCount++;
+			continue;
+		}
 
 		// Check for operators and symbols
 		switch (curr)
@@ -210,7 +318,7 @@ int main(int argc, char *argv[])
 		case '/':
 
 			// Handle division operator
-			lexemeTable[lexemeCount].tokenNumber = divsym;	   // set token number for division
+			lexemeTable[lexemeCount].tokenNumber = slashsym;   // set token number for division
 			strcpy(lexemeTable[lexemeCount].lexeme, "/");	   // set lexeme
 			lexemeTable[lexemeCount].isError = false;		   // no error
 			strcpy(lexemeTable[lexemeCount].errorMessage, ""); // no error message
@@ -296,56 +404,56 @@ int main(int argc, char *argv[])
 
 		case '=':
 			// Handle equality operator
-			lexemeTable[lexemeCount].tokenNumber = eqsym;       // set token number for “=”
-			strcpy(lexemeTable[lexemeCount].lexeme, "=");       // set lexeme to “=”
-			lexemeTable[lexemeCount].isError = false;           // no error
-			strcpy(lexemeTable[lexemeCount].errorMessage, "");  // clear error message
-			lexemeCount++;                                      // increment lexeme count
+			lexemeTable[lexemeCount].tokenNumber = eqsym;	   // set token number for “=”
+			strcpy(lexemeTable[lexemeCount].lexeme, "=");	   // set lexeme to “=”
+			lexemeTable[lexemeCount].isError = false;		   // no error
+			strcpy(lexemeTable[lexemeCount].errorMessage, ""); // clear error message
+			lexemeCount++;									   // increment lexeme count
 			break;
 
 		case '(':
 			// Handle left parenthesis
-			lexemeTable[lexemeCount].tokenNumber = lparentsym;  // set token number for “(”
-			strcpy(lexemeTable[lexemeCount].lexeme, "(");       // set lexeme to “(”
-			lexemeTable[lexemeCount].isError = false;           // no error
-			strcpy(lexemeTable[lexemeCount].errorMessage, "");  // clear error message
-			lexemeCount++;                                      // increment lexeme count
+			lexemeTable[lexemeCount].tokenNumber = lparentsym; // set token number for “(”
+			strcpy(lexemeTable[lexemeCount].lexeme, "(");	   // set lexeme to “(”
+			lexemeTable[lexemeCount].isError = false;		   // no error
+			strcpy(lexemeTable[lexemeCount].errorMessage, ""); // clear error message
+			lexemeCount++;									   // increment lexeme count
 			break;
 
 		case ')':
 			// Handle right parenthesis
-			lexemeTable[lexemeCount].tokenNumber = rparentsym;  // set token number for “)”
-			strcpy(lexemeTable[lexemeCount].lexeme, ")");       // set lexeme to “)”
-			lexemeTable[lexemeCount].isError = false;           // no error
-			strcpy(lexemeTable[lexemeCount].errorMessage, "");  // clear error message
-			lexemeCount++;                                      // increment lexeme count
+			lexemeTable[lexemeCount].tokenNumber = rparentsym; // set token number for “)”
+			strcpy(lexemeTable[lexemeCount].lexeme, ")");	   // set lexeme to “)”
+			lexemeTable[lexemeCount].isError = false;		   // no error
+			strcpy(lexemeTable[lexemeCount].errorMessage, ""); // clear error message
+			lexemeCount++;									   // increment lexeme count
 			break;
 
 		case ',':
 			// Handle comma symbol
-			lexemeTable[lexemeCount].tokenNumber = commasym;    // set token number for “,”
-			strcpy(lexemeTable[lexemeCount].lexeme, ",");       // set lexeme to “,”
-			lexemeTable[lexemeCount].isError = false;           // no error
-			strcpy(lexemeTable[lexemeCount].errorMessage, "");  // clear error message
-			lexemeCount++;                                      // increment lexeme count
+			lexemeTable[lexemeCount].tokenNumber = commasym;   // set token number for “,”
+			strcpy(lexemeTable[lexemeCount].lexeme, ",");	   // set lexeme to “,”
+			lexemeTable[lexemeCount].isError = false;		   // no error
+			strcpy(lexemeTable[lexemeCount].errorMessage, ""); // clear error message
+			lexemeCount++;									   // increment lexeme count
 			break;
 
 		case ';':
 			// Handle semicolon symbol
-			lexemeTable[lexemeCount].tokenNumber = semicolonsym;// set token number for “;”
-			strcpy(lexemeTable[lexemeCount].lexeme, ";");       // set lexeme to “;”
-			lexemeTable[lexemeCount].isError = false;           // no error
-			strcpy(lexemeTable[lexemeCount].errorMessage, "");  // clear error message
-			lexemeCount++;                                      // increment lexeme count
+			lexemeTable[lexemeCount].tokenNumber = semicolonsym; // set token number for “;”
+			strcpy(lexemeTable[lexemeCount].lexeme, ";");		 // set lexeme to “;”
+			lexemeTable[lexemeCount].isError = false;			 // no error
+			strcpy(lexemeTable[lexemeCount].errorMessage, "");	 // clear error message
+			lexemeCount++;										 // increment lexeme count
 			break;
 
 		case '.':
 			// Handle period symbol
-			lexemeTable[lexemeCount].tokenNumber = periodsym;   // set token number for “.”
-			strcpy(lexemeTable[lexemeCount].lexeme, ".");       // set lexeme to “.”
-			lexemeTable[lexemeCount].isError = false;           // no error
-			strcpy(lexemeTable[lexemeCount].errorMessage, "");  // clear error message
-			lexemeCount++;                                      // increment lexeme count
+			lexemeTable[lexemeCount].tokenNumber = periodsym;  // set token number for “.”
+			strcpy(lexemeTable[lexemeCount].lexeme, ".");	   // set lexeme to “.”
+			lexemeTable[lexemeCount].isError = false;		   // no error
+			strcpy(lexemeTable[lexemeCount].errorMessage, ""); // clear error message
+			lexemeCount++;									   // increment lexeme count
 			break;
 
 		default:
@@ -354,96 +462,22 @@ int main(int argc, char *argv[])
 			lexemeTable[lexemeCount].tokenNumber = 0;							// no token number
 			strcpy(lexemeTable[lexemeCount].errorMessage, "Invalid character"); // set error message
 			lexemeTable[lexemeCount].lexeme[0] = curr;							// set lexeme to the invalid character
+			lexemeCount++;														// increment lexeme count
+
 			break;
 		} // end switch - end check for operators and symbols
 
-		// Check for identifiers and numbers
-		if(isalpha(curr)){
-			char buffer[MAX_IDENT_LENGTH + 1];
-			int len = 0;
-			// collect letters and digits
-			do{
-				if(len < MAX_IDENT_LENGTH){
-					buffer[len++] = curr; // if length is smaller than 11 save into buffer
-				}
-				else{
-					len++; // count for overflow and do not store into buffer
-				}
-				curr = fgetc(fp); // read next character
-			}while(isalnum(curr)); // continue do-while loop
-			ungetc(curr, fp); // push back into stream if non-alnum
-
-			if(len > MAX_IDENT_LENGTH){
-				buffer[MAX_IDENT_LENGTH] = '\0'; //truncate buffer
-			}
-			else{
-				buffer[len] = '\0';
-			}
-
-			if(len > MAX_IDENT_LENGTH){
-				// ident name too long error
-				lexemeTable[lexemeCount].isError = true;
-				strcpy(lexemeTable[lexemeCount].errorMessage, "Error: name too long");
-			}
-			else{
-				int tok = getToken(buffer);
-				if(tok != 0){
-					lexemeTable[lexemeCount].tokenNumber = tok; // save reserved word in lexeme table
-				}
-				else{
-					lexemeTable[lexemeCount].tokenNumber = identsym; // save user identifier in lexeme table
-				}
-				strcpy(lexemeTable[lexemeCount].lexeme, buffer);
-				lexemeTable[lexemeCount].isError = false;
-				lexemeTable[lexemeCount].errorMessage[0] = '\0';
-			}
-			lexemeCount++;
-			continue;
-		}
-
-		if(isdigit(curr)){
-			char buffer[MAX_IDENT_LENGTH + 1];
-			int len = 0;
-			//collect digits
-			do{
-				if(len < MAX_NUMBER_LENGTH){
-					buffer[len++] = curr; // save into buffer if less than 5
-				}
-				else{
-					len++; // count for overflow
-				}
-				curr = fgetc(fp);
-			}while(isdigit(curr));
-		ungetc(curr, fp); // push back any non-digit
-
-		if(len > MAX_NUMBER_LENGTH){
-			buffer[MAX_NUMBER_LENGTH] = '\0'; // truncate buffer
-		}
-		else{
-			buffer[len] = '\0'; 
-		}
-
-		if(len > MAX_NUMBER_LENGTH){
-			// number too long error
-			lexemeTable[lexemeCount].isError = true; // 
-			strcpy(lexemeTable[lexemeCount].errorMessage, "Error: number too long");
-		}
-		else{
-			lexemeTable[lexemeCount].tokenNumber = numbersym; // save token number 
-			strcpy(lexemeTable[lexemeCount].lexeme, buffer); // copy buffer into lexeme index
-			lexemeTable[lexemeCount].isError = false;
-			lexemeTable[lexemeCount].errorMessage[0] = '\0';
-		}
-		lexemeCount++;
-		continue;
-		} 
-
 	} // end while
 	fclose(fp); // close the file
+
+	// Print the results
+	printLexemeTable(lexemeTable, lexemeCount); // print the lexeme table
+	printTokenList(lexemeTable, lexemeCount);	// print the token list
 } // end main
 
 void printFile(FILE *fp)
 {
+	printf("\nSource Code:\n");
 	// Function to print the source file
 	char ch;
 	while ((ch = fgetc(fp)) != EOF)

@@ -1,0 +1,5 @@
+var a, b;
+begin
+  when a < b
+    b := b - a;
+end.
