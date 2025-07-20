@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "../include/vm.h"
 
 #define ARRAY_SIZE 500
 #define INITIAL_BP (ARRAY_SIZE - 1)
@@ -19,35 +18,36 @@
 // Structure to represent an instruction with OP, L, and M fields
 typedef struct
 {
-    int op; // Opcode
-    int l;  // Lexicographical Level
-    int m;  // Modifier
+	int op; // Opcode
+	int l;	// Lexicographical Level
+	int m;	// Modifier
 } InstructionRegister;
 
 const char *oprNames[] = {
-    "RTN", // 0: Return
-    "ADD", // 1: Addition
-    "SUB", // 2: Subtraction
-    "MUL", // 3: Multiplication
-    "DIV", // 4: Divison
-    "EQL", // 5: Equal
-    "NEQ", // 6: Not Equal
-    "LSS", // 7: Less than
-    "LEQ", // 8: Less than or equal
-    "GTR", // 9: Greater than
-    "GEQ", // 10: Greater than or equal
+	"RTN", // 0: Return
+	"ADD", // 1: Addition
+	"SUB", // 2: Subtraction
+	"MUL", // 3: Multiplication
+	"DIV", // 4: Divison
+	"EQL", // 5: Equal
+	"NEQ", // 6: Not Equal
+	"LSS", // 7: Less than
+	"LEQ", // 8: Less than or equal
+	"GTR", // 9: Greater than
+	"GEQ", // 10: Greater than or equal
+	"MOD", // 11: Modulus
 };
 
 const char *opCodeNames[] = {
-    "INC", // 1 Increment
-    "OPR", // 2 Return
-    "LOD", // 3 Load to Stack
-    "STO", // 4 Store
-    "CAL", // 5 Call procedure
-    "LIT", // 6 Push Literal
-    "JMP", // 7 Jump to command
-    "JPC", // 8 Jump conditionally
-    "SYS", // 9 System calls
+	"INC", // 1 Increment
+	"OPR", // 2 Return
+	"LOD", // 3 Load to Stack
+	"STO", // 4 Store
+	"CAL", // 5 Call procedure
+	"LIT", // 6 Push Literal
+	"JMP", // 7 Jump to command
+	"JPC", // 8 Jump conditionally
+	"SYS", // 9 System calls
 };
 
 // Function declarations
@@ -215,6 +215,10 @@ int main(int argc, char *argv[])
 				break;
 			case 10: // GEQ
 				pas[SP + 1] = (pas[SP + 1] >= pas[SP]);
+				SP++;
+				break;
+			case 11: // MOD
+				pas[SP + 1] = (pas[SP + 1] % pas[SP]);
 				SP++;
 				break;
 			}
